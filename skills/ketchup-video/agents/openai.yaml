@@ -1,0 +1,8 @@
+interface:
+  display_name: "Ketchup Video"
+  short_description: "Catch up on this task with a short subtitled video."
+  default_prompt: "Use $ketchup-video for this request."
+policy:
+  products:
+    - CODEX
+  allow_implicit_invocation: false

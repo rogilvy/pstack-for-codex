@@ -51,7 +51,6 @@ test("missing Bun fails before dependency state is created", async () => {
 test("tool launchers report the same missing Bun preflight", () => {
   const fixture = mkdtempSync(join(tmpdir(), "pstack-bun-launchers-"));
   for (const launcher of [
-    join(scripts, "orch", "orch"),
     join(scripts, "watch-pr", "watch-pr"),
   ]) {
     const result = spawnSync(launcher, ["--help"], {
@@ -122,4 +121,11 @@ test("decision log rejects a directory target without modifying it", () => {
   assert.match(result.stderr, /log path must name a file/);
   assert.equal(after, before);
   rmSync(fixture, { recursive: true, force: true });
+});
+
+test("retired orchestration CLI is replaced rather than left as a broken launcher", () => {
+  assert.equal(existsSync(join(scripts, "orch")), false);
+  const packageJson = JSON.parse(readFileSync(join(scripts, "package.json"), "utf8"));
+  assert.doesNotMatch(JSON.stringify(packageJson.scripts), /\borch\b/);
+  assert.match(readFileSync(join(root, "skills/poteto-mode/playbooks/orchestrate.md"), "utf8"), /codex-agent-runtime\.md/);
 });

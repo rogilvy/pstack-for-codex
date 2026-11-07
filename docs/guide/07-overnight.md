@@ -48,4 +48,16 @@ Setup does not activate Benny. It can reconcile exactly two `PAUSED` project aut
 
 Next: [Steer with principle names](./08-principles.md).
 
-Autopilot starts independent verification at code-ready and repeats after patch-changing pushes. Its verdict must match the patch at merge-ready. Authorized hourly heartbeats append the queue log each tick and message only when state changes.
+## Run a queue or a larger program
+
+[Autopilot-full](../../skills/poteto-mode/playbooks/autopilot-full.md) carries independent work through build, verification, and merge only when each external action is authorized. Each owner needs independent verification; it cannot merge on its own verdict.
+
+[Autopilot-stack](../../skills/poteto-mode/playbooks/autopilot-stack.md) is the same workflow without merging. Independent PRs stay independent. Stack a PR only on one it actually builds on, then review and land them yourself.
+
+Verification scales with the size and risk of the change. A rebase or minor correction gets a fresh verifier; new behavior or a large new diff calls for broader verification. The verdict must match the final patch, including after patch-changing pushes.
+
+[Orchestrate](../../skills/poteto-mode/playbooks/orchestrate.md) is an agentic coordinator for programs that outlive a single session. It assigns bounded work, checks artifacts, and coordinates integration rather than implementing code itself. The old `orch` CLI is removed. Keep ordinary work in the current task; a standing coordinator, separate task, or heartbeat still needs lifecycle authority.
+
+## Catch up without changing the work
+
+Invoke `$ketchup` for a plain-language account of what changed and the choices waiting on you, with recommendations, evidence, and risk. `$ketchup-video` offers a short subtitled slide video when rendering is available and keeps pending decisions in text. Both use supported task evidence and report history gaps. Neither authorizes a merge or any other pending action.

@@ -21,7 +21,7 @@ $arena compare three isolated designs for this state machine. Judge them on ille
 ## Review a branch
 
 ```text
-$interrogate review this branch against its stated intent. Report actionable findings with file evidence and explain every dismissal.
+$interrogate review this branch against its stated intent. Report findings with executable repros and independent parent reruns; explain discarded claims and blocked checks.
 ```
 
 ## Fix a bug
@@ -53,6 +53,30 @@ $swarm inspect each package for direct legacy-client calls. Keep the workers rea
 ```text
 $setup-benny inspect the dormant Benny pack and list every activation blocker. Do not create automations or write externally.
 ```
+
+## Prove a hard-to-reach property
+
+```text
+$create-formal-verification-skill the retry queue. A message must never be delivered twice.
+```
+
+Expect a stated scope, a counterexample when the property fails, and a project-local check that also fails on a broken control. A bounded model pass does not prove the entire product.
+
+## Catch up on ongoing work
+
+```text
+$ketchup
+```
+
+Use `$ketchup-video` for a subtitled video when the required tools are available. Decisions still appear in text, and the report changes nothing.
+
+## Sharpen a request
+
+```text
+$sharpen write the onboarding doc for the new billing service.
+```
+
+Review the improved prompt before sending it. Sharpening does not start the underlying task.
 
 ## Avoid these mistakes
 

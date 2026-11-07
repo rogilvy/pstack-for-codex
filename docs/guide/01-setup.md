@@ -7,14 +7,14 @@ This tutorial installs the plugin, checks skill discovery, and runs one represen
 Install the marketplace directly from the public GitHub repository:
 
 ```bash
-codex plugin marketplace add Aqua-123/pstack-for-codex
+codex plugin marketplace add https://github.com/rogilvy/pstack-for-codex
 codex plugin add pstack-for-codex@pstack-for-codex-local
 codex plugin list --json
 ```
 
 For development, pass the absolute checkout path to `codex plugin marketplace add`. Start a new Codex task after installation so the task receives the refreshed skill catalog.
 
-`codex plugin list --json` confirms the plugin installation, but Codex CLI `0.146.0` has no offline runtime skill-index command. The prompt below is the manual prompt-time discovery check; the automated release smoke validates the catalog files in the installed artifact without claiming model dispatch.
+The current validation environment is Codex CLI `0.167.0-alpha.4`. `codex plugin list --json` reports installation, not prompt-time dispatch. The prompt below checks discovery in a fresh task; the automated release smoke checks catalog files in the installed artifact. Consult the release report for completed checks.
 
 ## Check one skill
 

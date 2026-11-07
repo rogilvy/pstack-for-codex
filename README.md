@@ -1,6 +1,6 @@
 # pstack for Codex
 
-`pstack-for-codex` is a Codex-native derivative of [pstack](https://github.com/cursor/plugins/tree/main/pstack). It packages deliberate engineering workflows as 55 explicit-only skills and 23 Poteto Mode playbooks.
+`pstack-for-codex` is a Codex-native derivative of [pstack](https://github.com/cursor/plugins/tree/main/pstack). It packages deliberate engineering workflows as 59 explicit-only skills and 23 Poteto Mode playbooks.
 
 Use `$poteto-mode` for a substantial engineering task. It selects a playbook, records the work as verifiable steps, and invokes narrower skills when the steps need them. The parent task keeps authority for integration, external writes, commits, pushes, and the final result.
 
@@ -9,19 +9,19 @@ Use `$poteto-mode` for a substantial engineering task. It selects a playbook, re
 This public repository is a Codex marketplace. Install it directly from GitHub:
 
 ```bash
-codex plugin marketplace add Aqua-123/pstack-for-codex
+codex plugin marketplace add https://github.com/rogilvy/pstack-for-codex
 codex plugin add pstack-for-codex@pstack-for-codex-local
 ```
 
-For a local checkout, replace `Aqua-123/pstack-for-codex` with its absolute path. Confirm the installed plugin:
+For a local checkout, replace `https://github.com/rogilvy/pstack-for-codex` with its absolute path. Confirm the installed plugin:
 
 ```bash
 codex plugin list --json
 ```
 
-Codex CLI `0.153.4` does not expose an offline runtime skill-index command. The release suite validates the skill catalog from the installed artifact; start a new task to exercise prompt-time skill discovery.
+The current validation environment uses Codex CLI `0.167.0-alpha.4`. An installation listing is not proof of prompt-time skill dispatch. The release suite checks the installed artifact; start a new task to exercise skill discovery. See the release report for checks actually completed.
 
-All 55 skills require explicit invocation. Codex stores their full identities under the `pstack-for-codex` namespace. In a prompt, invoke a skill with its registered `$name`:
+All 59 skills require explicit invocation. Codex stores their full identities under the `pstack-for-codex` namespace. In a prompt, invoke a skill with its registered `$name`:
 
 ```text
 $poteto-mode add a --json flag to this command. Keep text output byte-identical. Verify both modes.
@@ -58,13 +58,17 @@ The other skills are useful when you want one specific operation:
 | [`$architect`](./skills/architect/SKILL.md) | Settle types, callers, and module boundaries before implementation. |
 | [`$arena`](./skills/arena/SKILL.md) | Compare isolated attempts at the same brief. |
 | [`$swarm`](./skills/swarm/SKILL.md) | Cover independent slices or races and aggregate the result. |
-| [`$interrogate`](./skills/interrogate/SKILL.md) | Run a skeptical, multi-lens review of a diff with different verified model profiles when available. |
+| [`$interrogate`](./skills/interrogate/SKILL.md) | Find bugs with executable repros and independent parent reruns; use verified model diversity when available. |
 | [`$tdd`](./skills/tdd/SKILL.md) | Reproduce a bug with a failing test before fixing it. |
 | [`$no-comments`](./skills/no-comments/SKILL.md) | Review comments and remove ones that do not earn their place. |
 | [`$unslop`](./skills/unslop/SKILL.md) | Remove vague or machine-shaped prose. |
 | [`$show-me-your-work`](./skills/show-me-your-work/SKILL.md) | Keep a reviewable `decisions.tsv` trail. |
 | [`$setup-benny`](./skills/setup-benny/SKILL.md) | Inspect or configure the dormant Benny polling pack. |
 | [`$make-bot-ui`](./skills/make-bot-ui/SKILL.md) | Build a local UI for an authenticated user-owned webhook. |
+| [`$create-formal-verification-skill`](./skills/create-formal-verification-skill/SKILL.md) | Generate a project check for a high-value property, with explicit scope and a failing control. |
+| [`$maintain-formal-verification-skill`](./skills/maintain-formal-verification-skill/SKILL.md) | Reconcile formal checks with changed code and rerun them. |
+| [`$statechart`](./skills/statechart/SKILL.md) | Check a bounded TLA+ model and draw states and counterexample paths in the reader's terms. |
+| [`$ketchup-video`](./skills/ketchup-video/SKILL.md) | Summarize the task as a short subtitled video, with pending decisions in text. |
 
 Browse the [complete skill directory](./skills/) or read the [pstack guide](./docs/guide/README.md).
 
@@ -88,18 +92,17 @@ The two stable automation names are `pstack-benny-triage` and `pstack-benny-repr
 
 ## Develop and verify
 
-The metadata and resource validator requires Node.js. The legacy orchestrator and watch-PR scripts require [Bun](https://bun.sh/).
+The metadata and resource validator requires Node.js. The watch-PR and plan-check scripts use [Bun](https://bun.sh/). Install both script packages before running the root release suite:
 
 ```bash
-node scripts/validate-plugin.mjs --json
-node --test tests/*.test.mjs
-cd skills/poteto-mode/scripts
-bun install --frozen-lockfile
-bun test orch watch-pr
-bun run typecheck
+(cd skills/poteto-mode/scripts && bun install --frozen-lockfile)
+(cd skills/statechart/scripts && bun install --frozen-lockfile)
+npm test
 ```
 
-The validator reports Bun as an optional capability. Skills that depend on the Bun scripts must stop or declare their fallback when Bun is unavailable.
+`npm test` is the release entry point, including the installed-artifact smoke check. For bounded offline work use `npm run verify:offline`; it does not establish installation or prompt-time dispatch. The old `orch` CLI is removed: orchestration now follows the agentic playbook.
+
+The statechart compiler supports Node.js 22.18+, Bun 1.1.5+, or Deno 2+. Live model checking additionally requires Java 11+ and TLC 1.7.4. Installing these tools is opt-in, not a plugin-install side effect. An offline compiler test does not prove a live TLC run. Missing dependencies must be reported with the skill's fallback or blocker.
 
 ## Update or remove
 
@@ -132,4 +135,4 @@ See [Codex adaptation notes](./docs/codex-adaptation.md) for the behavioral chan
 
 MIT. See [LICENSE](./LICENSE) and [NOTICE](./NOTICE).
 
-The 0.4.0 refresh tracks upstream pstack 0.15.24. It adds `$in-your-own-words`, `$ketchup`, and `$sharpen`, improves plan fence checks, and updates PR watching and forge-neutral stack handling. Codex authority, explicit-only discovery, profile inheritance, and supported history access remain enforced.
+The 0.5.0 refresh tracks upstream pstack 0.15.36 at `6b0300214a09fd6029cfb7077043125758cd1fd2`. It includes 58 upstream skills plus the Codex-only `$setup-benny`, adds formal verification, statecharts, and video catch-ups, and updates executable review and agentic orchestration. Codex authority, explicit-only discovery, profile inheritance, and supported history access remain enforced.

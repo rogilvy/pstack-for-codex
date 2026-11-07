@@ -1,0 +1,8 @@
+interface:
+  display_name: "Create Formal Verification Skill"
+  short_description: "Create and prove a project-local formal verification skill."
+  default_prompt: "Use $create-formal-verification-skill for this request."
+policy:
+  products:
+    - CODEX
+  allow_implicit_invocation: false

@@ -28,6 +28,10 @@ Use `$technical-writing` for documentation and `$unslop` for the final prose pas
 
 Use `$correct` when the same mistake has at least two examples. Prefer an architecture, type, lint, test, or tool constraint over a prose reminder. Use `$benchmark-checklist` before you preserve or publish a performance number.
 
+## Generate the right verification skill
+
+Use `$create-verification-skill` and `$maintain-verification-skill` for real app or command flows. Use `$create-formal-verification-skill` and `$maintain-formal-verification-skill` for a stated property checked by a model checker, proof, or another verifier. Both belong in project-local skills and must be tested against the actual scope they claim. [Verify and ship](./06-verify-and-ship.md#prove-a-property-with-a-formal-verification-skill) explains the bounds and failing controls.
+
 ## Keep provenance separate
 
 Do not edit [`upstream.lock.json`](../../upstream.lock.json) to describe a local customization. The lock records the imported source. Put derivative behavior in the compatibility map, tests, and adaptation notes. [UPSTREAM.md](../../UPSTREAM.md) covers refreshes.

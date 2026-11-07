@@ -30,13 +30,13 @@ $swarm check every package for direct calls to the legacy client. One read-only 
 
 Use `$swarm` when the work divides by package, file set, test group, or another independent boundary. Do not use it to make several writers share one checkout.
 
-## Review the design with `$interrogate`
+## Review implemented behavior with `$interrogate`
 
 ```text
-$interrogate review this design for correctness, migration risk, operability, and unnecessary complexity.
+$interrogate review this branch for real bugs and regressions. Reproduce findings and independently rerun them. Do not change product code.
 ```
 
-`$interrogate` returns findings grouped by action and explains dismissals. Distinct model families are useful when observable, but installed model labels do not prove which model served a request. Reports mark unverified identity instead of claiming diversity.
+`$interrogate` asks reviewers for executable repros and has the parent independently rerun them before retaining findings. It explains discarded claims and reports blocked checks without calling them verified. For a design with no implementation, first use a spike or prototype to settle concrete uncertainties. Distinct model families are useful when observable, but installed model labels do not prove which model served a request. Reports mark unverified identity instead of claiming diversity.
 
 For an unfamiliar package or interface, a short usage tutorial can be a design artifact. It exposes awkward call sites before implementation commits the repository to the shape.
 

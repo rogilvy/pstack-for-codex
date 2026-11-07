@@ -1,0 +1,8 @@
+interface:
+  display_name: "Statechart"
+  short_description: "Check TLA+ models and explain counterexamples as statecharts."
+  default_prompt: "Use $statechart for this request."
+policy:
+  products:
+    - CODEX
+  allow_implicit_invocation: false
