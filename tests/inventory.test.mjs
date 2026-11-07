@@ -15,11 +15,15 @@ test("fork and upstream identities remain separate", async () => {
     readJson("package.json"),
     readJson("upstream.lock.json"),
   ]);
-  assert.equal(manifest.version, "0.4.0");
-  assert.equal(packageJson.version, "0.4.0");
-  assert.equal(lock.source.version, "0.15.24");
-  assert.equal(lock.source.commit, "1e5c90a4b6f249917bd21fe361b3a2a7deb741b8");
-  assert.equal(lock.inventory.fileCount, 169);
+  assert.equal(manifest.version, "0.5.0");
+  assert.equal(packageJson.version, "0.5.0");
+  const packageLock = await readJson("package-lock.json");
+  assert.equal(packageLock.version, packageJson.version);
+  assert.equal(packageLock.packages[""].version, packageJson.version);
+  assert.deepEqual(packageLock.packages[""].engines, packageJson.engines);
+  assert.equal(lock.source.version, "0.15.36");
+  assert.equal(lock.source.commit, "6b0300214a09fd6029cfb7077043125758cd1fd2");
+  assert.equal(lock.inventory.fileCount, 573);
 });
 
 test("inventory accounts for every upstream file, skill, and playbook", async () => {
@@ -28,8 +32,8 @@ test("inventory accounts for every upstream file, skill, and playbook", async ()
     readJson("compatibility/pstack-map.json"),
     listSkillRecords(root),
   ]);
-  assert.equal(new Set(lock.files.map((entry) => entry.path)).size, 169);
-  assert.equal(compatibility.entries.length, 169);
+  assert.equal(new Set(lock.files.map((entry) => entry.path)).size, 573);
+  assert.equal(compatibility.entries.length, 573);
   assert.deepEqual(
     new Set(compatibility.entries.map((entry) => entry.upstreamPath)),
     new Set(lock.files.map((entry) => entry.path)),
@@ -39,7 +43,7 @@ test("inventory accounts for every upstream file, skill, and playbook", async ()
     .map((entry) => entry.path.match(/^skills\/([^/]+)\/SKILL\.md$/)?.[1])
     .filter(Boolean)
     .sort();
-  assert.equal(upstreamSkills.length, 54);
+  assert.equal(upstreamSkills.length, 58);
   assert.equal(records.length, EXPECTED_SKILL_COUNT);
   assert.deepEqual(
     records.map((record) => record.directory).filter((name) => name !== "setup-benny").sort(),
@@ -54,7 +58,7 @@ test("inventory accounts for every upstream file, skill, and playbook", async ()
   assert.equal(playbooks.length, 23);
 });
 
-test("behavioral coverage maps all 54 upstream skills and all 23 playbooks", async () => {
+test("behavioral coverage maps all 58 upstream skills and all 23 playbooks", async () => {
   const [lock, coverage, representative] = await Promise.all([
     readJson("upstream.lock.json"),
     readJson("evals/cases/coverage.yaml"),

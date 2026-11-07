@@ -55,3 +55,9 @@ Add `--profile <json-file>` for requested pairs and `--models <json-file>` only 
 On success, report the scope, written paths, receipt path, and each role's configuration status. Say that new profiles apply to newly spawned agents. When a panel inherits or loses distinct profiles, report reduced model diversity instead of claiming which model served it.
 
 On `review-required` or any collision, stop. Show the exact paths and do not suggest force deletion.
+
+## Optional proof skills
+
+After setup, check for an existing project verification skill or app harness. If absent, offer once to generate one with `$create-verification-skill`. Separately check for a formal verification skill that runs a model checker, proof, or other verifier against the code. If absent, offer once to generate one with `$create-formal-verification-skill` so a key property can be checked across every case in its stated scope, not only test cases. Invoke either only on acceptance; a decline ends that offer.
+
+When discussing panel configuration, distinguish runners from the cross-judge pool. The pool is ordered by preference and supplies one judge from outside the observable parent's family. Inheritance entries never judge. Missing family evidence must be reported, not inferred from the configured pair.

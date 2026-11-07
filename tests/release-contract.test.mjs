@@ -13,4 +13,7 @@ test("the default release gate includes offline verification and the installed C
   assert.match(manifest.scripts["verify:release"], /npm run verify:offline/);
   assert.match(manifest.scripts["verify:release"], /npm run test:installed/);
   assert.match(manifest.scripts["test:installed"], /PSTACK_RUN_INSTALLED_SMOKE=1/);
+  assert.match(manifest.scripts["verify:offline"], /npm run test:statechart/);
+  assert.match(manifest.scripts["typecheck"], /skills\/statechart\/scripts run typecheck/);
+  assert.doesNotMatch(manifest.scripts["test:bun"], /\borch\b/);
 });

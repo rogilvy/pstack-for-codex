@@ -26,9 +26,31 @@ The generated skill lives under `.agents/skills/verify-<app>/`. It contains laun
 
 Use `$maintain-verification-skill` to compare an existing verification skill with the current app. It edits only proven drift and reruns affected live checks.
 
+## Prove a property with a formal verification skill
+
+```text
+$create-formal-verification-skill the job lease and retry logic. A job must never run twice at once.
+```
+
+The generator chooses a high-value property and a fitting verifier. Event ordering often suits a bounded TLA+ model; properties of code inputs call for a code-level verifier when available. If only generated tests are available, it labels them as tests rather than formal proof.
+
+It records the property, tool, bounds, code correspondence, and omissions in a project-local skill under `.agents/skills/`. A deliberately broken control must fail. If the current product already violates the property, report the counterexample without weakening the property or changing product code unless authorized. A pass covers the stated model or bound, not the whole system.
+
+Run `$maintain-formal-verification-skill` after relevant merges or refactors. It checks that the model still matches the code, reruns verification and failing controls, and distinguishes drift from a product bug. Scheduling recurring maintenance requires a separate lifecycle request.
+
+## Show the behavior as a statechart
+
+```text
+$statechart what the user sees when they edit a note offline.
+```
+
+`$statechart` checks a TLA+ model and generates a Mermaid chart with counterexample paths in the reader's terms. Reproduce a model finding in real code before calling it a product bug. State the model's bounds, hidden transitions, and any unchecked rules.
+
+The compiler supports Node.js 22.18+, Bun 1.1.5+, or Deno 2+. Live checks require Java 11+ and TLC 1.7.4, installed only with opt-in. A missing checker or renderer is a declared limitation, not a reason to invent evidence.
+
 ## Review the diff
 
-Run the repository checks, inspect `git diff --check`, and use `$interrogate` for a skeptical review when the risk warrants it. Keep unsupported or trust-dependent checks visible as blockers or deferred operator gates.
+Run the repository checks, inspect `git diff --check`, and use `$interrogate` for a skeptical review when the risk warrants it. Retain bug findings only after executable repros and independent parent reruns; distinguish rejected claims from checks blocked by missing capabilities. Keep unsupported or trust-dependent checks visible as blockers or deferred operator gates.
 
 ## Open or merge only with authority
 

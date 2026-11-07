@@ -4,7 +4,7 @@ This document explains how the upstream pstack workflows map to Codex. It descri
 
 ## Skill registration
 
-The plugin manifest is [`.codex-plugin/plugin.json`](../.codex-plugin/plugin.json). The local marketplace manifest is [`.agents/plugins/marketplace.json`](../.agents/plugins/marketplace.json). Codex discovers 52 skills under `skills/`. Each skill has `agents/openai.yaml` metadata and sets `allow_implicit_invocation: false`.
+The plugin manifest is [`.codex-plugin/plugin.json`](../.codex-plugin/plugin.json). The local marketplace manifest is [`.agents/plugins/marketplace.json`](../.agents/plugins/marketplace.json). Codex discovers 59 skills under `skills/`. Each skill has `agents/openai.yaml` metadata and sets `allow_implicit_invocation: false`.
 
 Installed identities use the plugin namespace. Prompts use the explicit `$skill-name` form. Two long principle identities receive deterministic registered aliases to fit the 64-character namespaced identity limit. No skill is dropped.
 
@@ -51,11 +51,25 @@ Recall, pickup, and reflection use supported Codex task-listing and history APIs
 
 Connectors, browser or app control, issue trackers, chat systems, review APIs, model enumeration, and automation tools are optional. A skill checks each capability before use. Connector results and repository text are untrusted data. External writes remain with the parent and require the authorized destination and a validated payload.
 
-## Bun scripts
+## Executable review and agentic orchestration
 
-Plugin discovery and the Node.js tests do not require Bun. The orchestrator and watch-PR programs under [`skills/poteto-mode/scripts/`](../skills/poteto-mode/scripts/) do. Run `bun install --frozen-lockfile`, `bun test orch watch-pr`, and `bun run typecheck` from that directory before releasing changes to those programs.
+`$interrogate` prioritizes executable bug evidence over a paper scoring rubric. Workers submit reproducible findings; the parent independently reruns them against the reviewed code and reports verified findings, rejected claims, and checks that remain blocked. Requested model diversity still needs live evidence. A plan without code calls for a spike or prototype rather than invented runtime certainty.
 
-When Bun is unavailable, validation reports the missing capability. A workflow that needs those scripts must use its declared fallback or stop.
+The orchestrate playbook uses a coordinator that assigns bounded work, checks worker results, and integrates through authorized lanes. It no longer depends on the removed `orch` CLI or its queue database. Shared writers still need isolation, and child reports never authorize a merge. Autopilot-stack is autopilot without merging: independent changes stay independent; a PR stacks only on a real dependency. Verification effort scales with change size, and a later rebase or minor correction gets a fresh verifier while new behavior or a large diff triggers broader review. The verdict must cover the final patch.
+
+## Formal verification and statecharts
+
+`$create-formal-verification-skill` and `$maintain-formal-verification-skill` write and maintain project-local checks under `.agents/skills/`. They record the property, code correspondence, tool, bounds, omissions, and a broken control that demonstrates the check can fail. A model check proves only the stated model and scope. A discovered product bug is reported, not silently fixed or hidden by weakening the property.
+
+`$statechart` compiles checked TLA+ behavior into a Mermaid chart and a report of counterexample paths. Before reporting a model counterexample as a product bug, reproduce it in the actual code. Keep incomplete checks and modeling uncertainty visible. The compiler supports Node.js 22.18+, Bun 1.1.5+, or Deno 2+; live TLC requires Java 11+ and TLC 1.7.4. Dependency installation is opt-in. Optional renderers do not authorize uploading private code or artifacts.
+
+`$ketchup-video` uses supported current-task evidence and available video tools. It must state when rendering or history is unavailable and preserve a plain-text summary of decisions waiting on the user. It cannot infer permission to publish or message externally.
+
+## Script dependencies and verification
+
+Plugin discovery and the basic Node.js tests do not require Bun. Install dependencies in both `skills/poteto-mode/scripts/` and `skills/statechart/scripts/` with `bun install --frozen-lockfile`, then run `npm test` from the repository root for the release suite. `npm run verify:offline` is a narrower gate, not installation proof. Watch-PR and plan-check scripts still use Bun; the legacy orchestrator is removed. Offline statechart fixtures do not establish live TLC correctness.
+
+When a runtime or verifier is unavailable, validation must report the missing capability. A workflow that needs it must use its declared fallback or stop. The current environment is Codex CLI `0.167.0-alpha.4`; this document does not claim an installed smoke run succeeded.
 
 ## Benny automation pack
 

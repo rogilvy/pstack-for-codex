@@ -19,3 +19,9 @@ cases:
   - id: unsafe-fanout
     expected: writable fanout is refused without exclusive ownership or isolation
     proof: no child starts
+  - id: executable-review
+    expected: isolated reviewers execute candidate bug paths and the parent reruns every retained finding
+    proof: unexecuted concerns remain unverified and no majority vote substitutes for a repro
+  - id: agentic-project
+    expected: one coordinator delegates bounded owners and reads their artifacts plus live state
+    proof: no retired orch CLI, inbox polling loop or hidden lifecycle object is required

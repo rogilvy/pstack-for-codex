@@ -1,0 +1,8 @@
+interface:
+  display_name: "Maintain Formal Verification Skill"
+  short_description: "Bring formal verification back in sync with current code."
+  default_prompt: "Use $maintain-formal-verification-skill for this request."
+policy:
+  products:
+    - CODEX
+  allow_implicit_invocation: false

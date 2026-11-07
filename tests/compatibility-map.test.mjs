@@ -19,16 +19,27 @@ test("every locked upstream path has one complete compatibility entry", async ()
   const map = JSON.parse(await fs.readFile(path.join(root, "compatibility/pstack-map.json"), "utf8"));
   const result = validateCompatibility(lock, map);
   assert.deepEqual(result.errors, []);
-  assert.equal(map.entries.length, 169);
-  assert.equal(new Set(map.entries.map((entry) => entry.upstreamPath)).size, 169);
-  assert.equal(map.refreshDecisions.length, 87);
+  assert.equal(map.entries.length, 573);
+  assert.equal(new Set(map.entries.map((entry) => entry.upstreamPath)).size, 573);
+  assert.equal(map.refreshDecisions.length, 469);
   assert.deepEqual(
     Object.fromEntries(["added", "changed", "deleted-or-renamed"].map((kind) => [kind, map.refreshDecisions.filter((entry) => entry.kind === kind).length])),
-    { added: 5, changed: 82, "deleted-or-renamed": 0 },
+    { added: 411, changed: 51, "deleted-or-renamed": 7 },
   );
   for (const decision of map.refreshDecisions) {
     assert.ok(decision.disposition.length > 0);
     assert.ok(decision.rationale.length > 0);
+  }
+});
+
+test("every mapped Codex file exists and preserved artifacts match the locked hash", async () => {
+  const map = JSON.parse(await fs.readFile(path.join(root, "compatibility/pstack-map.json"), "utf8"));
+  for (const entry of map.entries) {
+    if (entry.classification === "provenance-only") continue;
+    const content = await fs.readFile(path.join(root, entry.derivedPath));
+    if (entry.classification === "preserved") {
+      assert.equal(sha256(content), entry.upstreamSha256, entry.derivedPath);
+    }
   }
 });
 

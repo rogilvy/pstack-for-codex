@@ -7,7 +7,7 @@ This guide takes one task from installation through verification. Every pstack s
 3. [Understand the code](./03-understand.md).
 4. [Design the change](./04-design.md).
 5. [Build and clean the change](./05-build-and-clean.md).
-6. [Verify and ship](./06-verify-and-ship.md).
+6. [Verify and ship](./06-verify-and-ship.md): real behavior, formal properties, and statecharts.
 7. [Run authorized overnight work](./07-overnight.md).
 8. [Steer with principle names](./08-principles.md).
 9. [Make the workflows yours](./09-make-it-yours.md).
