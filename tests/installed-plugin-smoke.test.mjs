@@ -6,6 +6,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { discoverHooks } from "./helpers/codex-hook-discovery.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const enabled = process.env.PSTACK_RUN_INSTALLED_SMOKE === "1";
@@ -14,7 +15,7 @@ function codex(args, codexHome, json = true) {
   let output;
   try {
     output = execFileSync("codex", args, {
-      env: { ...process.env, CODEX_HOME: codexHome },
+      env: { ...process.env, CODEX_HOME: codexHome, HOME: path.join(path.dirname(codexHome), "user-home") },
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -108,6 +109,20 @@ test("clean Codex profile installs, validates, and tears down the complete plugi
   assert.equal(await pathExists(path.join(installedRoot, "node_modules")), false);
   assert.equal(await pathExists(path.join(installedRoot, ".git")), false);
 
+  const hookBinaries = ["codex", ...(process.env.PSTACK_CODEX_APP_BINARY ? [process.env.PSTACK_CODEX_APP_BINARY] : [])];
+  const hookEnv = { ...process.env, CODEX_HOME: codexHome, HOME: userHome };
+  const beforeHooks = [];
+  for (const binary of hookBinaries) {
+    const discovered = await discoverHooks(binary, { cwd: projectRoot, env: hookEnv });
+    assert.equal(discovered.data.length, 1);
+    const [entry] = discovered.data;
+    assert.deepEqual(entry.errors, []);
+    assert.deepEqual(entry.warnings, []);
+    assert.deepEqual(entry.hooks.map((hook) => hook.eventName).sort(), ["sessionEnd", "sessionStart", "subagentStart", "userPromptSubmit"]);
+    assert.ok(entry.hooks.every((hook) => hook.trustStatus === "untrusted"));
+    beforeHooks.push(discovered);
+  }
+  context.diagnostic(`hook discovery checked ${hookBinaries.length} runtime(s); remote discovery disabled in test processes; hook trust unchanged; prompt-time execution not exercised`);
   const beforeLaunch = await pluginSnapshot(installedRoot);
   const launch = () => execFileSync(path.join(installedRoot, "skills/poteto-mode/scripts/watch-pr/watch-pr"), ["--help"], {
     cwd: projectRoot,
@@ -117,6 +132,18 @@ test("clean Codex profile installs, validates, and tears down the complete plugi
   assert.match(launch(), /Usage: watch-pr/);
   assert.match(launch(), /Usage: watch-pr/);
   assert.deepEqual(await pluginSnapshot(installedRoot), beforeLaunch, "cold and warm launches must preserve the plugin fingerprint");
+  for (const [index, binary] of hookBinaries.entries()) {
+    assert.deepEqual(await discoverHooks(binary, { cwd: projectRoot, env: hookEnv }), beforeHooks[index], "Codex must discover the same hook fingerprints after bootstrapping");
+  }
+  const legacyModules = path.join(installedRoot, "skills/poteto-mode/scripts/node_modules");
+  await fs.mkdir(path.join(legacyModules, ".bin"), { recursive: true });
+  await fs.symlink("../typescript/bin/tsc", path.join(legacyModules, ".bin/tsc"));
+  for (const binary of hookBinaries) {
+    const rejected = await discoverHooks(binary, { cwd: projectRoot, env: hookEnv });
+    assert.deepEqual(rejected.data[0].hooks, []);
+    assert.match(rejected.data[0].warnings.join("\n"), /failed to fingerprint plugin contents: unsupported plugin entry type:/);
+  }
+  await fs.rm(legacyModules, { recursive: true });
 
   const validator = await import(`${pathToFileURL(path.join(installedRoot, "scripts/validate-plugin.mjs")).href}?smoke=${Date.now()}`);
   const validation = await validator.validatePlugin(installedRoot, { probeBun: true });
