@@ -92,7 +92,11 @@ The two stable automation names are `pstack-benny-triage` and `pstack-benny-repr
 
 ## Develop and verify
 
-The metadata and resource validator requires Node.js. The watch-PR and plan-check scripts use [Bun](https://bun.sh/). Install both script packages before running the root release suite:
+Version 0.5.1 fixes runtime dependency installation without changing the upstream skill inventory. The installed plugin directory stays immutable. The `watch-pr` launcher installs its locked production dependencies under `${XDG_CACHE_HOME:-$HOME/.cache}/pstack-for-codex/poteto-mode-tools/`, keyed by the package manifest, lockfile, and platform. It skips lifecycle scripts and publishes completed installs atomically. Concurrent launches share only completed caches. An incomplete or damaged cache gets a fresh generation without deleting a runtime another process may be using. A dependency change gets a new cache without modifying an older runtime.
+
+Do not run development dependency installation commands inside an installed plugin cache. Generated `node_modules` symlinks can make Codex reject the plugin fingerprint and skip all its hooks. If an older version has already generated that directory, reinstall the updated plugin through Codex, then review its hooks in Codex's normal hook trust flow. The launcher does not edit installed files or change hook trust.
+
+The following commands are for a separate development checkout, not an installed plugin. The metadata and resource validator requires Node.js. The watch-PR and plan-check scripts use [Bun](https://bun.sh/). Install both script packages before running the root release suite:
 
 ```bash
 (cd skills/poteto-mode/scripts && bun install --frozen-lockfile)

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -56,6 +57,17 @@ async function filesBelow(target) {
   return result;
 }
 
+async function pluginSnapshot(root) {
+  const entries = await fs.readdir(root, { recursive: true, withFileTypes: true });
+  return Promise.all(entries.map(async (entry) => {
+    const absolute = path.join(entry.parentPath, entry.name);
+    const value = entry.isSymbolicLink() ? `symlink:${await fs.readlink(absolute)}`
+      : entry.isDirectory() ? "directory"
+      : createHash("sha256").update(await fs.readFile(absolute)).digest("hex");
+    return [path.relative(root, absolute), value];
+  }));
+}
+
 test("clean Codex profile installs, validates, and tears down the complete plugin", { skip: !enabled }, async (context) => {
   const temporary = await fs.mkdtemp(path.join(os.tmpdir(), "pstack-installed-smoke-"));
   context.after(() => fs.rm(temporary, { recursive: true, force: true }));
@@ -95,6 +107,16 @@ test("clean Codex profile installs, validates, and tears down the complete plugi
   assert.ok(await pathExists(path.join(installedRoot, ".codex-plugin/plugin.json")));
   assert.equal(await pathExists(path.join(installedRoot, "node_modules")), false);
   assert.equal(await pathExists(path.join(installedRoot, ".git")), false);
+
+  const beforeLaunch = await pluginSnapshot(installedRoot);
+  const launch = () => execFileSync(path.join(installedRoot, "skills/poteto-mode/scripts/watch-pr/watch-pr"), ["--help"], {
+    cwd: projectRoot,
+    env: { ...process.env, XDG_CACHE_HOME: path.join(temporary, "runtime-cache") },
+    encoding: "utf8",
+  });
+  assert.match(launch(), /Usage: watch-pr/);
+  assert.match(launch(), /Usage: watch-pr/);
+  assert.deepEqual(await pluginSnapshot(installedRoot), beforeLaunch, "cold and warm launches must preserve the plugin fingerprint");
 
   const validator = await import(`${pathToFileURL(path.join(installedRoot, "scripts/validate-plugin.mjs")).href}?smoke=${Date.now()}`);
   const validation = await validator.validatePlugin(installedRoot, { probeBun: true });
